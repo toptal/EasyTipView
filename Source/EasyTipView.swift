@@ -107,9 +107,9 @@ public extension EasyTipView {
      - parameter item:      The UIBarButtonItem or UITabBarItem instance which the EasyTipView will be pointing to.
      - parameter superview: A view which is part of the UIBarButtonItem instances superview hierarchy. Ignore this parameter in order to display the EasyTipView within the main window.
      */
-    public func show(animated: Bool = true, forItem item: UIBarItem, withinSuperView superview: UIView? = nil) {
+    public func show(animated: Bool = true, forItem item: UIBarItem, withinSuperView superview: UIView? = nil, completion: (() -> ())? = nil) {
         if let view = item.view {
-            show(animated: animated, forView: view, withinSuperview: superview)
+            show(animated: animated, forView: view, withinSuperview: superview, completion: completion)
         }
     }
     
@@ -120,7 +120,7 @@ public extension EasyTipView {
      - parameter view:      The UIView instance which the EasyTipView will be pointing to.
      - parameter superview: A view which is part of the UIView instances superview hierarchy. Ignore this parameter in order to display the EasyTipView within the main window.
      */
-    public func show(animated: Bool = true, forView view: UIView, withinSuperview superview: UIView? = nil) {
+    public func show(animated: Bool = true, forView view: UIView, withinSuperview superview: UIView? = nil, completion: (() -> ())? = nil) {
         
         precondition(superview == nil || view.hasSuperview(superview!), "The supplied superview <\(superview!)> is not a direct nor an indirect superview of the supplied reference view <\(view)>. The superview passed to this method should be a direct or an indirect superview of the reference view. To display the tooltip within the main window, ignore the superview parameter.")
         
@@ -150,9 +150,12 @@ public extension EasyTipView {
         }
         
         if animated {
-            UIView.animate(withDuration: preferences.animating.showDuration, delay: 0, usingSpringWithDamping: damping, initialSpringVelocity: velocity, options: [.curveEaseInOut], animations: animations, completion: nil)
+            UIView.animate(withDuration: preferences.animating.showDuration, delay: 0, usingSpringWithDamping: damping, initialSpringVelocity: velocity, options: [.curveEaseInOut], animations: animations, completion: { _ in
+                completion?()
+            })
         }else{
             animations()
+            completion?()
         }
     }
     
